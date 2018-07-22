@@ -1,3 +1,6 @@
 [submodule "Font-Awesome"]
 	path = Font-Awesome
 	url = git@github.com:FortAwesome/Font-Awesome.git
+[submodule "compboostSplines"]
+	path = compboostSplines
+	url = git@github.com:schalkdaniel/compboostSplines.git

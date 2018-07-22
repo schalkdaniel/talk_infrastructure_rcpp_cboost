@@ -1,6 +1,6 @@
 ---
-title: "<code>Habits</code>"
-subtitle: "This is a badass revealjs presentation"
+title: "<code>Rcpp</code> and <code>compboost</code>"
+subtitle: "Boosting performance using <code>C++</code> and an example that it works"
 author: "Created by <a href='https://danielschalk.com/' target='_blank'>Daniel Schalk</a>"
 date: "March 22, 2005<div style='margin-top:50px;'><a href='https://danielschalk.com' target='_blank'><i style='margin-right:70px;' class='fab fa-linkedin fa-3x'></i></a><a href='https://danielschalk.com' target='_blank'><i style='margin-right:70px;' class='fab fa-github fa-3x'></i></a><a href='https://danielschalk.com' target='_blank'><i class='fab fa-twitter fa-3x'></i></a></div>"
 output:
@@ -19,40 +19,205 @@ output:
 ---
 
 ```{r, include=FALSE}
+options(width = 80)
 knitr::opts_chunk$set(collapse = TRUE)
+
+devtools::load_all("compboostSplines")
 ```
 
-# Ordinary Markdown
+# Before We Start
 
-## Text and Lists
+## Some Stuff Used For the Presentation
 
-This is an ordinary **paragraph**. Including urls is also quite easy with `[]()` (i.e. search for something on [google](https://google.com)). Unordered lists looks like this:
+- For some demos we will use sparse matrices. To create "meaningful" matrices we use `compboostSplines`, a [GitHub package](https://github.com/schalkdaniel/compboostSplines) to create spline feature matrices:
+    ```{r, eval=FALSE}
+    devtools::install_github("schalkdaniel/compboostSplines")
+    ```
 
-- Element 1
-- Element 2
+- The compilation requires [`Rcpp`](https://cran.r-project.org/web/packages/Rcpp/index.html), [`RcppArmadillo`](https://cran.r-project.org/web/packages/RcppArmadillo/index.html), and for windows users additionally [`Rtools`](https://cran.r-project.org/bin/windows/Rtools/).
+
+You can also follow the presentation [online](https://danielschalk.com/talk_infrastructure_rcpp_cboost/#/).
+
+# Sparse Matrices
+
+## What is the deal of sparse matrices
+
+- Sparse matrices stores just information about entries unequal to zero.
+- We can save a lot of memory using sparse matrices depending on the sparsity.
+- If correctly used sparse matrices are also improve performance of computations.
+
+## Getting sparse matrices
+
+Simulate data:
+```{r}
+n.sim = 1000
+
+x = sort(runif(n.sim, min = 0, max = 10))
+y = 0.5 * x^2 + 7 * sin(2 * x) + rnorm(n.sim, 0, 5)
+
+knots = createKnots(values = x, n_knots = 40, degree = 3)
+
+plot(x, y)
+```
 
 
-# Use R Code
-
-## R Chunks
-
-`R` Chunks can be included with standard `Rmd` syntax:
+## Create dense matrix
 
 ```{r}
-head(iris)
+basis.dense  = createSplineBasis(values = x, degree = 3, 
+  knots = knots)
+print(basis.dense[1:5, 1:10], digits = 4)
+
+# Structure of dense matrix:
+str(basis.dense)
+
+# Object size:
+object.size(basis.dense)
 ```
 
-## Graphics
+## Create sparse matrix
 
-```{r, warning=FALSE,message=FALSE,echo=FALSE,fig.align='center'}
-library(ggplot2) 
+```{r}
+library(Matrix)
 
-ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) + geom_point() + theme_bw()
+basis.sparse = createSparseSplineBasis(values = x, degree = 3, 
+  knots = knots)
+basis.sparse[1:5, 1:10]
+
+# Structure of sparse matrix:
+str(basis.sparse)
+
+# Object sizes:
+object.size(basis.sparse)
 ```
 
+
+## What are we comparing
+
+- Compare different implementations by computing the ordinary least squares estimator:
+\[
+\hat{\beta} = (X^TX)^{-1}X^Ty
+\]
+
+- To get an idea of the matrix multiplication **not** runtime of algorithms like computing the inverse, we calculate a $K = (X^TX)^{-1}$ in advance.
+
+## A first benchmark
+
+As starter we compare matrix multiplication by using dense matrices from base and sparse matrices from the `Matrix` package: 
+
+```{r}
+K = solve(t(basis.dense) %*% basis.dense)
+
+microbenchmark::microbenchmark(
+  "R dense" = K %*% t(basis.dense) %*% y,
+  "R sparse" = K %*% t(basis.sparse) %*% y
+)
+```
+
+
+## The same with bigger matrices
+
+```{r}
+n.sim = 10000
+
+x = runif(n.sim, min = 0, max = 10)
+y = 0.5 * x^2 + 7 * sin(2 * x) + rnorm(n.sim, 0, 5)
+
+knots = createKnots(values = x, n_knots = 100, degree = 3)
+
+basis.dense  = createSplineBasis(values = x, degree = 3, 
+  knots = knots)
+basis.sparse = createSparseSplineBasis(values = x, degree = 3, 
+  knots = knots)
+
+object.size(basis.dense)
+object.size(basis.sparse)
+
+K = solve(t(basis.dense) %*% basis.dense)
+
+microbenchmark::microbenchmark(
+  "R dense" = K %*% t(basis.dense) %*% y,
+  "R sparse" = K %*% t(basis.sparse) %*% y
+)
+```
+
+## Now one step further using `C++` 
+
+With `Rcpp` and `RcppArmadillo` we can define a sparse matrix multiplication using `C++`:
+```{r}
+code.cpp = "
+arma::vec sparseMatMulti (arma::sp_mat& X, arma::vec& y, arma::mat& K)
+{
+  return K * X.t() * y;
+}
+"
+
+Rcpp::cppFunction(code = code.cpp, depends = "RcppArmadillo")
+
+# What happens now?
+```
+
+## Now one step further using `C++` 
+
+Comparing `R` and `C++` computations yields:
+```{r}
+microbenchmark::microbenchmark(
+  "R dense" = K %*% t(basis.dense) %*% y,
+  "R sparse" = K %*% t(basis.sparse) %*% y,
+  "C++ sparse" = sparseMatMulti(basis.sparse, y, K)
+)
+```
+
+Looks very promising, but we can do better!
+
+
+
+## Using sparse matrices smarter
+
+Due to the CRC structure of armadillo sparse matrices we should avoid slicing rows of the sparse matrix. Therefore, we set the braces to force a computation of $Xy$ first:
+```{r}
+code1.cpp = "
+arma::mat sparseMatMulti (arma::sp_mat& X, arma::vec& y, arma::mat& K)
+{
+  return K * X * y;
+}
+"
+code2.cpp = "
+arma::mat sparseMatMultiSmart (arma::sp_mat& X, arma::vec& y, 
+  arma::mat& K) 
+{
+  return K * (X * y);
+}
+"
+Rcpp::cppFunction(code = code1.cpp, depends = "RcppArmadillo")
+Rcpp::cppFunction(code = code2.cpp, depends = "RcppArmadillo")
+
+# What happens now?
+```
+
+## Using sparse matrices smarter
+
+Setting the braces differently and using the transposed directly instead of internal computation yields:
+```{r}
+# Calculate transposed sparse matrix:
+basis.sparse.t = t(createSparseSplineBasis(values = x, degree = 3, 
+  knots = knots))
+
+microbenchmark::microbenchmark(
+  "R dense" = K %*% t(basis.dense) %*% y,
+  "R sparse" = K %*% basis.sparse.t %*% y,
+  "C++ sparse" = sparseMatMulti(basis.sparse.t, y, K),
+  "C++ sparse smart" = sparseMatMultiSmart(basis.sparse.t, y, K)
+)
+```
 
 # Thanks for your attention!
 
 ## 
 <h1>Credits</h1>
 
+- [**revealjs**](https://revealjs.com/)
+- [**Font-Awesome:**](https://www.google.com)
+- [**rmarkdown**](https://rmarkdown.rstudio.com/)
+- [**revealjs (R Package)**](https://cran.r-project.org/web/packages/revealjs/index.html)
+- [**Google Fonts**](https://fonts.google.com/)
