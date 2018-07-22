@@ -1,0 +1,58 @@
+---
+title: "<code>Habits</code>"
+subtitle: "This is a badass revealjs presentation"
+author: "Created by <a href='https://danielschalk.com/' target='_blank'>Daniel Schalk</a>"
+date: "March 22, 2005<div style='margin-top:50px;'><a href='https://danielschalk.com' target='_blank'><i style='margin-right:70px;' class='fab fa-linkedin fa-3x'></i></a><a href='https://danielschalk.com' target='_blank'><i style='margin-right:70px;' class='fab fa-github fa-3x'></i></a><a href='https://danielschalk.com' target='_blank'><i class='fab fa-twitter fa-3x'></i></a></div>"
+output:
+  revealjs::revealjs_presentation:
+    css: myreveal.css
+    transition: slide
+    includes:
+      in_header: header.html
+      after_body: after.html
+    self_contained: false
+    reveal_options:
+      controls: true
+      controlsTutorial: true
+      center: true
+      slideNumber: true
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+# Ordinary Markdown
+
+## Text and Lists
+
+This is an ordinary **paragraph**. Including urls is also quite easy with `[]()` (i.e. search for something on [google](https://google.com)). Unordered lists looks like this:
+
+- Element 1
+- Element 2
+
+
+# Use R Code
+
+## R Chunks
+
+`R` Chunks can be included with standard `Rmd` syntax:
+
+```{r}
+head(iris)
+```
+
+## Graphics
+
+```{r, warning=FALSE,message=FALSE,echo=FALSE,fig.align='center'}
+library(ggplot2) 
+
+ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) + geom_point() + theme_bw()
+```
+
+
+# Thanks for your attention!
+
+## 
+<h1>Credits</h1>
+
