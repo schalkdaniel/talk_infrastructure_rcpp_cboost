@@ -64,8 +64,7 @@ plot(x, y)
 ## Create dense matrix
 
 ```{r}
-basis.dense  = createSplineBasis(values = x, degree = 3, 
-  knots = knots)
+basis.dense  = createSplineBasis(values = x, degree = 3, knots = knots)
 print(basis.dense[1:5, 1:10], digits = 4)
 
 # Structure of dense matrix:
@@ -125,10 +124,8 @@ y = 0.5 * x^2 + 7 * sin(2 * x) + rnorm(n.sim, 0, 5)
 
 knots = createKnots(values = x, n_knots = 100, degree = 3)
 
-basis.dense  = createSplineBasis(values = x, degree = 3, 
-  knots = knots)
-basis.sparse = createSparseSplineBasis(values = x, degree = 3, 
-  knots = knots)
+basis.dense  = createSplineBasis(values = x, degree = 3, knots = knots)
+basis.sparse = createSparseSplineBasis(values = x, degree = 3, knots = knots)
 
 object.size(basis.dense)
 object.size(basis.sparse)
