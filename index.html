@@ -533,14 +533,14 @@ knots =<span class="st"> </span><span class="kw">createKnots</span>(<span class=
 <span class="kw">print</span>(basis.dense[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>], <span class="dt">digits =</span> <span class="dv">4</span>)
 ##         [,1]   [,2]   [,3]      [,4] [,5] [,6] [,7] [,8] [,9] [,10]
 ## [1,] 0.16667 0.6667 0.1667 0.000e+00    0    0    0    0    0     0
-## [2,] 0.15772 0.6663 0.1759 1.007e-06    0    0    0    0    0     0
-## [3,] 0.14752 0.6651 0.1874 1.056e-05    0    0    0    0    0     0
-## [4,] 0.08777 0.6332 0.2779 1.188e-03    0    0    0    0    0     0
-## [5,] 0.08744 0.6329 0.2785 1.207e-03    0    0    0    0    0     0
+## [2,] 0.13095 0.6609 0.2080 7.680e-05    0    0    0    0    0     0
+## [3,] 0.12910 0.6603 0.2105 9.057e-05    0    0    0    0    0     0
+## [4,] 0.08079 0.6256 0.2920 1.644e-03    0    0    0    0    0     0
+## [5,] 0.07958 0.6242 0.2945 1.736e-03    0    0    0    0    0     0
 
 <span class="co"># Structure of dense matrix:</span>
 <span class="kw">str</span>(basis.dense)
-##  num [1:1000, 1:44] 0.1667 0.1577 0.1475 0.0878 0.0874 ...
+##  num [1:1000, 1:44] 0.1667 0.131 0.1291 0.0808 0.0796 ...
 
 <span class="co"># Object size:</span>
 <span class="kw">object.size</span>(basis.dense)
@@ -555,21 +555,21 @@ basis.sparse[<span class="dv">1</span><span class="op">:</span><span class="dv">
 ## 5 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
 ##                                                             
 ## [1,] 0.16666667 0.6666667 0.1666667 .            . . . . . .
-## [2,] 0.15772495 0.6663380 0.1759361 1.006938e-06 . . . . . .
-## [3,] 0.14751809 0.6651091 0.1873622 1.055925e-05 . . . . . .
-## [4,] 0.08776841 0.6331897 0.2778537 1.188178e-03 . . . . . .
-## [5,] 0.08743755 0.6328543 0.2785010 1.207094e-03 . . . . . .
+## [2,] 0.13095299 0.6609311 0.2080391 7.680171e-05 . . . . . .
+## [3,] 0.12910311 0.6602789 0.2105274 9.057440e-05 . . . . . .
+## [4,] 0.08078773 0.6256036 0.2919646 1.644061e-03 . . . . . .
+## [5,] 0.07958193 0.6241794 0.2945026 1.736055e-03 . . . . . .
 
 <span class="co"># Structure of sparse matrix:</span>
 <span class="kw">str</span>(basis.sparse)
 ## Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
 ##   ..@ i       : int [1:3998] 0 1 2 3 4 5 6 7 8 9 ...
-##   ..@ p       : int [1:45] 0 22 73 155 259 370 472 568 676 781 ...
+##   ..@ p       : int [1:45] 0 26 74 151 247 340 429 506 584 669 ...
 ##   ..@ Dim     : int [1:2] 1000 44
 ##   ..@ Dimnames:List of 2
 ##   .. ..$ : NULL
 ##   .. ..$ : NULL
-##   ..@ x       : num [1:3998] 0.1667 0.1577 0.1475 0.0878 0.0874 ...
+##   ..@ x       : num [1:3998] 0.1667 0.131 0.1291 0.0808 0.0796 ...
 ##   ..@ factors : list()
 
 <span class="co"># Object sizes:</span>
@@ -594,8 +594,8 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 )
 ## Unit: microseconds
 ##      expr      min        lq      mean    median        uq      max neval cld
-##   R dense 1188.624 1436.8835 2058.0830 1794.8300 2175.6205 8350.196   100   b
-##  R sparse  419.115  536.5425  859.8838  663.2205  749.6865 5737.716   100  a</code></pre></div>
+##   R dense 1161.061 1277.1670 1553.9223 1299.2555 1338.3350 5243.085   100   b
+##  R sparse  373.050  403.8225  541.9987  430.4425  473.1095 4698.992   100  a</code></pre></div>
 </section><section id="the-same-with-bigger-matrices" class="slide level2">
 <h2>The same with bigger matrices</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n.sim =<span class="st"> </span><span class="dv">10000</span>
@@ -621,8 +621,8 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 )
 ## Unit: milliseconds
 ##      expr      min       lq     mean   median       uq      max neval cld
-##   R dense 54.46147 67.21445 99.15814 76.49406 96.22038 298.6240   100   b
-##  R sparse 10.64438 14.57499 29.03631 16.95734 21.43487 137.6534   100  a</code></pre></div>
+##   R dense 51.92338 59.67058 87.47493 65.09717 86.07233 221.2611   100   b
+##  R sparse 10.02741 12.71937 27.77968 14.48682 17.73156 142.6956   100  a</code></pre></div>
 </section><section id="now-one-step-further-using-c" class="slide level2">
 <h2>Now one step further using <code>C++</code></h2>
 <p>With <code>Rcpp</code> and <code>RcppArmadillo</code> we can define a sparse matrix multiplication using <code>C++</code>:</p>
@@ -645,10 +645,14 @@ Rcpp<span class="op">::</span><span class="kw">cppFunction</span>(<span class="d
   <span class="st">&quot;C++ sparse&quot;</span> =<span class="st"> </span><span class="kw">sparseMatMulti</span>(basis.sparse, y, K)
 )
 ## Unit: milliseconds
-##        expr       min        lq     mean    median       uq       max neval cld
-##     R dense 48.971830 63.027646 86.63644 72.290265 88.47790 261.11966   100   c
-##    R sparse  9.861651 13.015771 31.12596 15.665631 19.83016 156.57324   100  b 
-##  C++ sparse  7.400958  8.748166 10.47567  9.871279 11.17412  33.85161   100 a</code></pre></div>
+##        expr       min        lq      mean    median       uq       max neval
+##     R dense 55.208329 63.874937 92.431408 69.118587 89.02030 250.43375   100
+##    R sparse 10.098394 12.796208 32.055886 14.992406 17.62169 164.77316   100
+##  C++ sparse  7.269183  8.226538  9.531072  9.262431 10.38668  14.67882   100
+##  cld
+##    c
+##   b 
+##  a</code></pre></div>
 <p>Looks very promising, but we can do better!</p>
 </section><section id="using-sparse-matrices-smarter" class="slide level2">
 <h2>Using sparse matrices smarter</h2>
@@ -680,20 +684,23 @@ basis.sparse.t =<span class="st"> </span><span class="kw">t</span>(<span class="
 microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
   <span class="st">&quot;R dense&quot;</span> =<span class="st"> </span>K <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(basis.dense) <span class="op">%*%</span><span class="st"> </span>y,
   <span class="st">&quot;R sparse&quot;</span> =<span class="st"> </span>K <span class="op">%*%</span><span class="st"> </span>basis.sparse.t <span class="op">%*%</span><span class="st"> </span>y,
+  <span class="st">&quot;R sparse smart&quot;</span> =<span class="st"> </span>K <span class="op">%*%</span><span class="st"> </span>(basis.sparse.t <span class="op">%*%</span><span class="st"> </span>y),
   <span class="st">&quot;C++ sparse&quot;</span> =<span class="st"> </span><span class="kw">sparseMatMulti</span>(basis.sparse.t, y, K),
   <span class="st">&quot;C++ sparse smart&quot;</span> =<span class="st"> </span><span class="kw">sparseMatMultiSmart</span>(basis.sparse.t, y, K)
 )
 ## Unit: microseconds
-##              expr       min        lq        mean     median          uq
-##           R dense 52046.846 73535.337 112037.5200 83295.9845 156453.5520
-##          R sparse  9718.171 12777.329  26055.0005 14984.6655  19849.9800
-##        C++ sparse  6643.154  8227.482  10184.0334  9404.7780  11275.8795
-##  C++ sparse smart   169.912   228.436    315.6089   287.7175    346.9975
+##              expr       min         lq        mean     median         uq
+##           R dense 54147.328 64401.6620 100150.6250 73197.2135 97120.3440
+##          R sparse  9991.162 12587.2170  25449.0591 14948.0400 17204.2725
+##    R sparse smart   137.440   218.2420    291.7987   257.6995   340.7675
+##        C++ sparse  6728.488  8154.0430   9472.9772  8868.9920  9930.1820
+##  C++ sparse smart   160.850   227.8705    299.0331   259.7760   345.2985
 ##         max neval cld
-##  263783.109   100   c
-##  157624.430   100  b 
-##   21959.712   100 a  
-##    2158.629   100 a</code></pre></div>
+##  248682.527   100   c
+##  147274.567   100  b 
+##     837.097   100 a  
+##   17758.372   100 a  
+##    1111.221   100 a</code></pre></div>
 </section></section>
 <section><section id="thanks-for-your-attention" class="titleslide slide level1"><h1>Thanks for your attention!</h1></section><section id="section" class="slide level2">
 <h2></h2>

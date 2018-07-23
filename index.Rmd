@@ -203,6 +203,7 @@ basis.sparse.t = t(createSparseSplineBasis(values = x, degree = 3,
 microbenchmark::microbenchmark(
   "R dense" = K %*% t(basis.dense) %*% y,
   "R sparse" = K %*% basis.sparse.t %*% y,
+  "R sparse smart" = K %*% (basis.sparse.t %*% y),
   "C++ sparse" = sparseMatMulti(basis.sparse.t, y, K),
   "C++ sparse smart" = sparseMatMultiSmart(basis.sparse.t, y, K)
 )
