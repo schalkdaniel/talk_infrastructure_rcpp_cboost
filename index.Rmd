@@ -194,7 +194,7 @@ Rcpp::cppFunction(code = code2.cpp, depends = "RcppArmadillo")
 
 ## Using sparse matrices smarter
 
-Setting the braces differently and using the transposed directly instead of internal computation yields:
+Setting the braces differently and using the transposed directly yields:
 ```{r}
 # Calculate transposed sparse matrix:
 basis.sparse.t = t(createSparseSplineBasis(values = x, degree = 3, 
@@ -202,6 +202,7 @@ basis.sparse.t = t(createSparseSplineBasis(values = x, degree = 3,
 
 microbenchmark::microbenchmark(
   "R dense" = K %*% t(basis.dense) %*% y,
+  "R dense smart" = K %*% (t(basis.dense) %*% y),
   "R sparse" = K %*% basis.sparse.t %*% y,
   "R sparse smart" = K %*% (basis.sparse.t %*% y),
   "C++ sparse" = sparseMatMulti(basis.sparse.t, y, K),
